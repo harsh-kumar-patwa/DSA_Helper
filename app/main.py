@@ -48,7 +48,6 @@ st.markdown("""
     /* Hide Streamlit's default styling */
     #MainMenu {visibility: hidden;}
     footer {visibility: hidden;}
-    header {visibility: hidden;}
     
     /* Custom dark theme */
     .stApp {
@@ -81,6 +80,12 @@ st.markdown("""
     /* Ensure proper spacing */
     .stApp > div:first-child {
         padding-top: 1rem;
+    }
+    
+    /* Better paragraph and text styling */
+    p {
+        color: #f8f9fa;
+        line-height: 1.6;
     }
 </style>
 """, unsafe_allow_html=True)
@@ -193,12 +198,6 @@ st.markdown("""
         color: #ffffff;
         font-weight: 600;
         text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2);
-    }
-    
-    /* Better paragraph and text styling */
-    p, div {
-        color: #f8f9fa;
-        line-height: 1.6;
     }
     
     /* Enhanced sidebar styling */
