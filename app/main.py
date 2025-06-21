@@ -59,6 +59,29 @@ st.markdown("""
     .stMarkdown, .stText, .stWrite {
         color: #ffffff !important;
     }
+    
+    /* Fix sidebar layout issues */
+    .css-1d391kg {
+        background: linear-gradient(180deg, #2c3e50 0%, #34495e 100%);
+        min-height: 100vh;
+    }
+    
+    /* Ensure main content area uses full width when sidebar is collapsed */
+    .main .block-container {
+        max-width: 100%;
+        padding-left: 1rem;
+        padding-right: 1rem;
+    }
+    
+    /* Fix sidebar toggle button visibility */
+    .css-1rs6os {
+        z-index: 1000;
+    }
+    
+    /* Ensure proper spacing */
+    .stApp > div:first-child {
+        padding-top: 1rem;
+    }
 </style>
 """, unsafe_allow_html=True)
 
@@ -319,12 +342,6 @@ st.markdown("""
     /* Better sidebar text */
     .css-1d391kg p, .css-1d391kg div {
         color: #f8f9fa;
-    }
-    
-    /* Enhanced main content area */
-    .main .block-container {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        min-height: 100vh;
     }
 </style>
 """, unsafe_allow_html=True)
