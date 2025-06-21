@@ -42,65 +42,44 @@ st.set_page_config(
     }
 )
 
-# Custom theme configuration
 st.markdown("""
 <style>
-    /* Hide Streamlit's default styling */
-    #MainMenu {visibility: hidden;}
-    footer {visibility: hidden;}
-    
-    /* Custom dark theme */
+    /* --- GENERAL & DEFAULTS --- */
+    /* Hide Streamlit's default elements */
+    #MainMenu { visibility: hidden; }
+    footer { visibility: hidden; }
+
+    /* Import Google Fonts */
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+    /* --- LAYOUT & THEME --- */
     .stApp {
         background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
     }
-    
-    /* Ensure proper contrast for all text */
-    .stMarkdown, .stText, .stWrite {
+
+    /* Main content area fix */
+    .main .block-container {
+        max-width: 100% !important;
+        padding: 2rem 2rem 10rem;
+    }
+
+    /* Sidebar */
+    .css-1d391kg {
+        background: linear-gradient(180deg, #2c3e50 0%, #34495e 100%);
+    }
+
+    /* --- TYPOGRAPHY --- */
+    /* General text contrast */
+    .stMarkdown, .stText, .stWrite, .stSelectbox, .stMultiSelect {
         color: #ffffff !important;
     }
     
-    /* Fix sidebar layout issues */
-    .css-1d391kg {
-        background: linear-gradient(180deg, #2c3e50 0%, #34495e 100%);
-        min-height: 100vh;
-    }
-    
-    /* Ensure main content area uses full width when sidebar is collapsed */
-    .main .block-container {
-        max-width: 100%;
-        padding-left: 1rem;
-        padding-right: 1rem;
-    }
-    
-    /* Fix sidebar toggle button visibility */
-    .css-1rs6os {
-        z-index: 1000;
-    }
-    
-    /* Ensure proper spacing */
-    .stApp > div:first-child {
-        padding-top: 1rem;
-    }
-    
-    /* Better paragraph and text styling */
     p {
         color: #f8f9fa;
         line-height: 1.6;
     }
-</style>
-""", unsafe_allow_html=True)
 
-# Custom CSS for better styling
-st.markdown("""
-<style>
-    /* Import Google Fonts for better typography */
-    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
-    
-    /* Global font settings */
-    .stApp {
-        font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-    }
-    
     .main-header {
         font-size: 3.5rem;
         font-weight: 700;
@@ -120,100 +99,75 @@ st.markdown("""
         letter-spacing: -0.01em;
     }
     
-    /* Enhanced info boxes with better contrast */
-    .info-box {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        color: #ffffff;
-        padding: 1.5rem;
-        border-radius: 12px;
-        border-left: 5px solid #ffffff;
-        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
-        margin-bottom: 1rem;
-        backdrop-filter: blur(10px);
-    }
-    
-    .info-box h3 {
-        color: #ffffff;
-        font-weight: 600;
-        margin-bottom: 0.5rem;
-        text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2);
-    }
-    
-    .info-box p, .info-box ul, .info-box ol {
-        color: #f8f9fa;
-        line-height: 1.6;
-        margin-bottom: 0.5rem;
-    }
-    
-    .success-box {
-        background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
-        color: #ffffff;
-        padding: 1.5rem;
-        border-radius: 12px;
-        border-left: 5px solid #ffffff;
-        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
-        margin-bottom: 1rem;
-        backdrop-filter: blur(10px);
-    }
-    
-    .success-box h3 {
-        color: #ffffff;
-        font-weight: 600;
-        margin-bottom: 0.5rem;
-        text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2);
-    }
-    
-    .success-box ul, .success-box ol {
-        color: #f8f9fa;
-        line-height: 1.6;
-        margin-bottom: 0.5rem;
-    }
-    
-    .warning-box {
-        background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
-        color: #ffffff;
-        padding: 1.5rem;
-        border-radius: 12px;
-        border-left: 5px solid #ffffff;
-        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
-        margin-bottom: 1rem;
-        backdrop-filter: blur(10px);
-    }
-    
-    .warning-box h3 {
-        color: #ffffff;
-        font-weight: 600;
-        margin-bottom: 0.5rem;
-        text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2);
-    }
-    
-    .warning-box ol {
-        color: #f8f9fa;
-        line-height: 1.6;
-        margin-bottom: 0.5rem;
-    }
-    
-    /* Enhanced text styling */
     h1, h2, h3, h4, h5, h6 {
         color: #ffffff;
         font-weight: 600;
         text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2);
     }
     
-    /* Enhanced sidebar styling */
-    .css-1d391kg {
-        background: linear-gradient(180deg, #2c3e50 0%, #34495e 100%);
+    strong, b {
+        color: #ffffff;
+        font-weight: 600;
+        text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2);
+    }
+
+    a {
+        color: #74b9ff;
+        text-decoration: none;
+        font-weight: 500;
     }
     
-    /* Better metric styling */
-    .css-1wivap2 {
+    a:hover {
+        color: #0984e3;
+        text-decoration: underline;
+    }
+
+    code {
         background: rgba(255, 255, 255, 0.1);
-        border-radius: 8px;
-        padding: 1rem;
+        color: #ffffff;
+        padding: 0.2rem 0.4rem;
+        border-radius: 4px;
+        font-family: 'Courier New', monospace;
+    }
+
+    /* --- CUSTOM BOXES & CARDS --- */
+    .info-box, .success-box, .warning-box {
+        color: #ffffff;
+        padding: 1.5rem;
+        border-radius: 12px;
+        border-left: 5px solid #ffffff;
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        margin-bottom: 1rem;
         backdrop-filter: blur(10px);
     }
+    .info-box { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); }
+    .success-box { background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%); }
+    .warning-box { background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); }
     
-    /* Enhanced button styling */
+    .info-box h3, .success-box h3, .warning-box h3 {
+        color: #ffffff;
+        font-weight: 600;
+        margin-bottom: 0.5rem;
+        text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2);
+    }
+    
+    .info-box p, .info-box ul, .info-box ol,
+    .success-box ul, .success-box ol,
+    .warning-box ol {
+        color: #f8f9fa;
+        line-height: 1.6;
+        margin-bottom: 0.5rem;
+    }
+
+    blockquote {
+        background: rgba(255, 255, 255, 0.1);
+        border-left: 4px solid #667eea;
+        padding: 1rem;
+        border-radius: 8px;
+        color: #f8f9fa;
+    }
+
+    /* --- WIDGETS --- */
     .stButton > button {
         background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
         color: #ffffff;
@@ -229,118 +183,35 @@ st.markdown("""
         transform: translateY(-2px);
         box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
     }
-    
-    /* Enhanced selectbox styling */
-    .stSelectbox > div > div {
+
+    .stSelectbox > div > div, .stMultiSelect > div > div {
         background: rgba(255, 255, 255, 0.1);
         border-radius: 8px;
         color: #ffffff;
     }
     
-    /* Enhanced multiselect styling */
-    .stMultiSelect > div > div {
-        background: rgba(255, 255, 255, 0.1);
-        border-radius: 8px;
-        color: #ffffff;
-    }
+    .stCheckbox > div > div { color: #ffffff; }
     
-    /* Better checkbox styling */
-    .stCheckbox > div > div {
-        color: #ffffff;
-    }
-    
-    /* Enhanced progress bar */
     .stProgress > div > div > div {
         background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
     }
     
-    /* Better expander styling */
     .streamlit-expanderHeader {
         background: rgba(255, 255, 255, 0.1);
         color: #ffffff;
         border-radius: 8px;
         font-weight: 500;
     }
-    
-    /* Enhanced error and success messages */
+
     .stAlert {
         border-radius: 8px;
         backdrop-filter: blur(10px);
     }
     
-    /* Better table styling */
-    .dataframe {
-        background: rgba(255, 255, 255, 0.1);
-        color: #ffffff;
-        border-radius: 8px;
-    }
-    
-    /* Enhanced plotly chart styling */
     .js-plotly-plot {
         background: rgba(255, 255, 255, 0.05);
         border-radius: 12px;
         padding: 1rem;
-    }
-    
-    /* Better list styling */
-    ul, ol {
-        color: #f8f9fa;
-        line-height: 1.6;
-    }
-    
-    li {
-        margin-bottom: 0.5rem;
-    }
-    
-    /* Enhanced strong and bold text */
-    strong, b {
-        color: #ffffff;
-        font-weight: 600;
-        text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2);
-    }
-    
-    /* Better link styling */
-    a {
-        color: #74b9ff;
-        text-decoration: none;
-        font-weight: 500;
-    }
-    
-    a:hover {
-        color: #0984e3;
-        text-decoration: underline;
-    }
-    
-    /* Enhanced code styling */
-    code {
-        background: rgba(255, 255, 255, 0.1);
-        color: #ffffff;
-        padding: 0.2rem 0.4rem;
-        border-radius: 4px;
-        font-family: 'Courier New', monospace;
-    }
-    
-    /* Better blockquote styling */
-    blockquote {
-        background: rgba(255, 255, 255, 0.1);
-        border-left: 4px solid #667eea;
-        padding: 1rem;
-        border-radius: 8px;
-        color: #f8f9fa;
-    }
-    
-    /* Enhanced metric cards */
-    .metric-container {
-        background: rgba(255, 255, 255, 0.1);
-        border-radius: 12px;
-        padding: 1.5rem;
-        backdrop-filter: blur(10px);
-        border: 1px solid rgba(255, 255, 255, 0.2);
-    }
-    
-    /* Better sidebar text */
-    .css-1d391kg p, .css-1d391kg div {
-        color: #f8f9fa;
     }
 </style>
 """, unsafe_allow_html=True)
