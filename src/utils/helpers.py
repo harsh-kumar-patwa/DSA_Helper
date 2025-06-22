@@ -67,6 +67,30 @@ def create_multi_topic_selector(topics: List[str], key: str, label: str = "Selec
         help="Select topics you already know"
     )
 
+def create_difficulty_selector(key: str, label: str = "Select Difficulty Level") -> str:
+    """
+    Create a difficulty level selector
+    
+    Args:
+        key: Unique key for the selector
+        label: Label for the selector
+        
+    Returns:
+        Selected difficulty level
+    """
+    return st.selectbox(
+        label,
+        options=["all", "beginner", "intermediate", "advanced"],
+        format_func=lambda x: {
+            "all": "🌟 All Levels",
+            "beginner": "🟢 Beginner",
+            "intermediate": "🟡 Intermediate", 
+            "advanced": "🔴 Advanced"
+        }.get(x, x),
+        key=key,
+        help="Choose difficulty level for problem recommendations"
+    )
+
 def display_topic_info(topic: str, description: str, dependencies: List[str]):
     """
     Display topic information in a nice format
@@ -185,4 +209,96 @@ def validate_topic_selection(selected_topic: str, available_topics: List[str]) -
         st.error(f"Topic '{selected_topic}' not found in available topics!")
         return False
     
-    return True 
+    return True
+
+def display_problems(problems: List[Dict], topic: str, level: str):
+    """
+    Display problems in a nicely formatted way
+    
+    Args:
+        problems: List of problem dictionaries
+        topic: Selected topic
+        level: Selected difficulty level
+    """
+    if not problems:
+        st.warning(f"No problems found for {topic} at {level} level!")
+        return
+    
+    st.subheader(f"🎯 Problems for {topic}")
+    
+    # Show level filter info
+    if level != "all":
+        level_emoji = {
+            "beginner": "🟢",
+            "intermediate": "🟡", 
+            "advanced": "🔴"
+        }.get(level, "")
+        st.info(f"Showing {level_emoji} **{level.title()}** level problems")
+    else:
+        st.info("Showing **All** difficulty levels")
+    
+    # Display problems
+    for i, problem in enumerate(problems, 1):
+        with st.expander(f"{i}. {problem['title']} ({problem.get('level', 'unknown').title()})"):
+            st.write(f"**Description:** {problem['description']}")
+            
+            # Display single link
+            if 'link' in problem:
+                if 'leetcode.com' in problem['link']:
+                    st.markdown(f"🟠 **Practice on LeetCode:** [Open Problem]({problem['link']})")
+                elif 'geeksforgeeks.org' in problem['link']:
+                    st.markdown(f"🟢 **Practice on GeeksforGeeks:** [Open Problem]({problem['link']})")
+                else:
+                    st.markdown(f"🔗 **Practice Link:** [Open Problem]({problem['link']})")
+
+def create_problem_stats_chart(problem_counts: Dict[str, int]) -> go.Figure:
+    """
+    Create a chart showing problem count by topic
+    
+    Args:
+        problem_counts: Dictionary mapping topics to problem counts
+        
+    Returns:
+        Plotly figure object
+    """
+    if not problem_counts:
+        return None
+    
+    topics = list(problem_counts.keys())
+    counts = list(problem_counts.values())
+    
+    fig = px.bar(
+        x=topics,
+        y=counts,
+        title='Available Problems by Topic',
+        labels={'x': 'Topics', 'y': 'Number of Problems'},
+        color=counts,
+        color_continuous_scale='viridis'
+    )
+    
+    fig.update_layout(
+        xaxis_title="Topics",
+        yaxis_title="Number of Problems",
+        height=400,
+        xaxis_tickangle=-45
+    )
+    
+    return fig
+
+def display_problem_summary(total_problems: int, topic: str, level: str):
+    """
+    Display a summary of available problems
+    
+    Args:
+        total_problems: Total number of problems
+        topic: Selected topic
+        level: Selected difficulty level
+    """
+    level_text = f"{level} level" if level != "all" else "all levels"
+    
+    st.markdown(f"""
+    <div class="info-box">
+    <h3>📊 Problem Summary</h3>
+    <p>Found <strong>{total_problems}</strong> problems for <strong>{topic}</strong> at <strong>{level_text}</strong></p>
+    </div>
+    """, unsafe_allow_html=True) 

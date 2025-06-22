@@ -17,6 +17,12 @@ from data.topic_data import (
     get_all_categories,
     get_topics_by_category
 )
+from data.problem_data import (
+    get_problems_by_topic_and_level,
+    get_available_topics_for_problems,
+    get_difficulty_levels,
+    get_problem_count_by_topic
+)
 from graph.topic_graph import TopicGraph
 from graph.topological_sort import TopologicalSort
 from utils.helpers import (
@@ -26,7 +32,11 @@ from utils.helpers import (
     display_topic_info,
     create_learning_path_chart,
     display_progress,
-    validate_topic_selection
+    validate_topic_selection,
+    create_difficulty_selector,
+    display_problems,
+    create_problem_stats_chart,
+    display_problem_summary
 )
 
 # Page configuration
@@ -243,16 +253,17 @@ def main():
         st.header("🎯 Navigation")
         page = st.selectbox(
             "Choose a page",
-            ["🏠 Home", "🔍 Topic Explorer", "📈 Learning Path", "ℹ️ About"]
+            ["🏠 Home", "📚 Study Plan", "🧩 Problem Suggestions", "ℹ️ About"]
         )
         
         st.markdown("---")
         st.markdown("### 💡 How it works")
         st.info("**Smart Learning Paths**\n\n"
-                "• Analyzes topic dependencies\n"
-                "• Finds optimal study order\n"
-                "• Personalizes recommendations\n"
-                "• Tracks your progress")
+                "• Select your target topic\n"
+                "• Mark topics you already know\n"
+                "• Get personalized study path\n"
+                "• Practice with curated problems\n"
+                "• Track your progress")
     
     # Initialize graph
     if 'topic_graph' not in st.session_state:
@@ -262,12 +273,12 @@ def main():
     # Page routing
     if page == "🏠 Home":
         show_home_page()
-    elif page == "🔍 Topic Explorer":
-        show_topic_explorer()
-    elif page == "📈 Learning Path":
-        show_learning_path()
+    elif page == "📚 Study Plan":
+        show_study_plan()
     elif page == "ℹ️ About":
         show_about_page()
+    elif page == "🧩 Problem Suggestions":
+        show_problem_suggestions()
 
 def show_home_page():
     """Display the home page"""
@@ -290,8 +301,9 @@ def show_home_page():
         <div class="success-box">
         <h3>✨ Key Features</h3>
         <ul>
-        <li><strong>Topic Explorer:</strong> Browse all DSA topics and their dependencies</li>
-        <li><strong>Learning Path Generator:</strong> Get personalized learning recommendations</li>
+        <li><strong>Personalized Learning Paths:</strong> Get customized study recommendations</li>
+        <li><strong>Smart Topic Selection:</strong> Choose your target and known topics</li>
+        <li><strong>Problem Suggestions:</strong> Practice with curated problems by difficulty</li>
         <li><strong>Graph Visualization:</strong> See topic relationships visually</li>
         <li><strong>Progress Tracking:</strong> Track your learning progress</li>
         </ul>
@@ -303,9 +315,11 @@ def show_home_page():
         <div class="warning-box">
         <h3>🚀 Quick Start</h3>
         <ol>
-        <li>Go to <strong>Topic Explorer</strong> to browse topics</li>
-        <li>Use <strong>Learning Path</strong> to get recommendations</li>
-        <li>Check <strong>About</strong> to learn more</li>
+        <li>Go to <strong>Study Plan</strong> for learning paths</li>
+        <li>Select the topic you want to learn</li>
+        <li>Mark topics you already know</li>
+        <li>Get your personalized study path!</li>
+        <li>Practice with <strong>Problem Suggestions</strong></li>
         </ol>
         </div>
         """, unsafe_allow_html=True)
@@ -331,61 +345,10 @@ def show_home_page():
             fig = create_learning_path_chart(example_path)
             st.plotly_chart(fig, use_container_width=True)
 
-def show_topic_explorer():
-    """Display the topic explorer page"""
+def show_study_plan():
+    """Display the study plan page"""
     
-    st.markdown('<h2 class="sub-header">🔍 Topic Explorer</h2>', unsafe_allow_html=True)
-    
-    # Category selection
-    categories = get_all_categories()
-    selected_category = st.selectbox("Select Category", ["All Topics"] + categories)
-    
-    # Get topics based on selection
-    if selected_category == "All Topics":
-        topics = get_all_topics()
-    else:
-        topics = get_topics_by_category(selected_category)
-    
-    # Topic selection
-    selected_topic = create_topic_selector(topics, "explorer_topic", "Select a topic to explore")
-    
-    if selected_topic:
-        st.markdown("---")
-        
-        # Topic information
-        description = get_topic_description(selected_topic)
-        dependencies = st.session_state.topic_graph.get_prerequisites(selected_topic)
-        dependents = st.session_state.topic_graph.get_dependent_topics(selected_topic)
-        
-        col1, col2 = st.columns(2)
-        
-        with col1:
-            display_topic_info(selected_topic, description, dependencies)
-        
-        with col2:
-            st.subheader(f"📤 Topics that depend on {selected_topic}")
-            if dependents:
-                for dep in dependents:
-                    st.write(f"• {dep}")
-            else:
-                st.write("No topics depend on this one (it's a leaf node)")
-        
-        # Learning path for this topic
-        st.markdown("---")
-        st.subheader("🎯 Learning Path to this Topic")
-        
-        learning_path = st.session_state.topic_graph.get_learning_path(selected_topic)
-        st.markdown(format_learning_path(learning_path))
-        
-        # Visualize the path
-        if learning_path:
-            fig = create_learning_path_chart(learning_path)
-            st.plotly_chart(fig, use_container_width=True)
-
-def show_learning_path():
-    """Display the learning path generator page"""
-    
-    st.markdown('<h2 class="sub-header">📈 Learning Path Generator</h2>', unsafe_allow_html=True)
+    st.markdown('<h2 class="sub-header">📚 Study Plan</h2>', unsafe_allow_html=True)
     
     # User input section
     st.subheader("🎯 What do you want to learn?")
@@ -409,45 +372,56 @@ def show_learning_path():
         learning_path = st.session_state.topic_graph.get_learning_path(target_topic, known_topics)
         
         # Display results
-        col1, col2 = st.columns([2, 1], gap="large")
+        st.subheader("📚 Your Personalized Learning Path")
+        st.markdown(format_learning_path(learning_path))
+        
+        # Learning path visualization
+        if learning_path:
+            fig = create_learning_path_chart(learning_path)
+            st.plotly_chart(fig, use_container_width=True)
+        
+        # Topic information section
+        st.markdown("---")
+        st.subheader(f"ℹ️ About {target_topic}")
+        
+        # Get topic details
+        description = get_topic_description(target_topic)
+        dependencies = st.session_state.topic_graph.get_prerequisites(target_topic)
+        dependents = st.session_state.topic_graph.get_dependent_topics(target_topic)
+        
+        col1, col2 = st.columns(2)
         
         with col1:
-            st.subheader("📚 Your Personalized Learning Path")
-            st.markdown(format_learning_path(learning_path))
-            
-            # Learning path visualization
-            if learning_path:
-                fig = create_learning_path_chart(learning_path)
-                st.plotly_chart(fig, use_container_width=True)
+            display_topic_info(target_topic, description, dependencies)
         
         with col2:
-            st.subheader("📊 Path Statistics")
-            
-            # Calculate statistics
-            total_topics = len(learning_path)
-            known_in_path = len([t for t in learning_path if t in known_topics]) if known_topics else 0
-            new_topics = total_topics - known_in_path
-            
-            st.metric("Total Topics", total_topics)
-            st.metric("New Topics", new_topics)
-            st.metric("Already Known", known_in_path)
-            
-            if total_topics > 0:
-                efficiency = ((total_topics - new_topics) / total_topics) * 100
-                st.metric("Path Efficiency", f"{efficiency:.1f}%")
+            st.subheader(f"📤 Topics that depend on {target_topic}")
+            if dependents:
+                for dep in dependents:
+                    st.write(f"• {dep}")
+            else:
+                st.write("No topics depend on this one (it's a leaf node)")
         
-        # Progress tracking
-        if learning_path:
+        # Category information
+        categories = get_all_categories()
+        topic_category = None
+        for category in categories:
+            if target_topic in get_topics_by_category(category):
+                topic_category = category
+                break
+        
+        if topic_category:
             st.markdown("---")
-            st.subheader("📈 Track Your Progress")
+            st.subheader("📂 Category Information")
+            st.write(f"**Category:** {topic_category}")
             
-            # Create progress tracker
-            progress = {}
-            for topic in learning_path:
-                progress[topic] = st.checkbox(f"✅ Completed: {topic}", key=f"progress_{topic}")
-            
-            # Display progress
-            display_progress(progress)
+            # Show other topics in the same category
+            category_topics = get_topics_by_category(topic_category)
+            if len(category_topics) > 1:
+                st.write("**Other topics in this category:**")
+                for topic in category_topics:
+                    if topic != target_topic:
+                        st.write(f"• {topic}")
 
 def show_about_page():
     """Display the about page"""
@@ -490,7 +464,7 @@ def show_about_page():
         **User Features:**
         - Interactive topic explorer
         - Personalized learning paths
-        - Progress tracking
+        - Problem suggestions with links
         - Visual dependency graphs
         
         **Technology:**
@@ -510,12 +484,138 @@ def show_about_page():
     
     st.subheader("🚀 Future Enhancements")
     st.markdown("""
-    - **AI Integration:** Smart question recommendations
-    - **LeetCode Integration:** Direct problem suggestions
+    - **AI Integration:** Smart question recommendations based on performance
+    - **More Problem Sources:** Integration with additional coding platforms
     - **Personalized Learning:** Adaptive paths based on performance
-    - **Progress Analytics:** Detailed learning analytics
+    - **Progress Analytics:** Detailed learning analytics and insights
     - **Mobile App:** Native mobile application
+    - **Discussion Forums:** Community features for problem discussions
     """)
+
+def show_problem_suggestions():
+    """Display the problem suggestions page"""
+    
+    st.markdown('<h2 class="sub-header">🧩 Problem Suggestions</h2>', unsafe_allow_html=True)
+    
+    # User input section
+    st.subheader("🎯 What level of problems do you want to practice?")
+    
+    col1, col2 = st.columns(2)
+    
+    with col1:
+        # Topic selection
+        available_topics = get_available_topics_for_problems()
+        topic = create_topic_selector(available_topics, "problem_topic", "Select topic")
+    
+    with col2:
+        # Difficulty level selection
+        difficulty_level = create_difficulty_selector("difficulty_level", "Select difficulty level")
+    
+    # Generate problem suggestions
+    if topic and difficulty_level:
+        st.markdown("---")
+        
+        # Get problems
+        problems = get_problems_by_topic_and_level(topic, difficulty_level)
+        
+        if problems:
+            # Display problem summary
+            display_problem_summary(len(problems), topic, difficulty_level)
+            
+            # Display problems
+            display_problems(problems, topic, difficulty_level)
+            
+            # Show practice tips
+            st.markdown("---")
+            st.subheader("💡 Practice Tips")
+            
+            if difficulty_level == "beginner":
+                st.markdown("""
+                <div class="info-box">
+                <h3>🟢 Beginner Level Tips</h3>
+                <ul>
+                <li>Focus on understanding the problem statement clearly</li>
+                <li>Start with brute force solutions, then optimize</li>
+                <li>Practice basic data structure operations</li>
+                <li>Don't worry about time complexity initially</li>
+                </ul>
+                </div>
+                """, unsafe_allow_html=True)
+            elif difficulty_level == "intermediate":
+                st.markdown("""
+                <div class="info-box">
+                <h3>🟡 Intermediate Level Tips</h3>
+                <ul>
+                <li>Focus on time and space complexity</li>
+                <li>Learn multiple approaches to solve problems</li>
+                <li>Practice pattern recognition</li>
+                <li>Understand when to use specific algorithms</li>
+                </ul>
+                </div>
+                """, unsafe_allow_html=True)
+            elif difficulty_level == "advanced":
+                st.markdown("""
+                <div class="info-box">
+                <h3>🔴 Advanced Level Tips</h3>
+                <ul>
+                <li>Master complex algorithmic concepts</li>
+                <li>Focus on optimal solutions</li>
+                <li>Practice under time constraints</li>
+                <li>Understand edge cases and corner cases</li>
+                </ul>
+                </div>
+                """, unsafe_allow_html=True)
+            else:  # all levels
+                st.markdown("""
+                <div class="info-box">
+                <h3>🌟 General Practice Tips</h3>
+                <ul>
+                <li>Start with easier problems and gradually increase difficulty</li>
+                <li>Practice regularly and consistently</li>
+                <li>Review and understand different solution approaches</li>
+                <li>Join coding communities for discussion and help</li>
+                </ul>
+                </div>
+                """, unsafe_allow_html=True)
+        
+        # Topic overview and statistics
+        st.markdown("---")
+        st.subheader("📊 Topic Overview")
+        
+        col1, col2 = st.columns(2)
+        
+        with col1:
+            # Topic description
+            topic_description = get_topic_description(topic)
+            st.markdown(f"""
+            <div class="info-box">
+            <h3>📖 About {topic}</h3>
+            <p>{topic_description}</p>
+            </div>
+            """, unsafe_allow_html=True)
+        
+        with col2:
+            # Problem statistics for all topics
+            st.subheader("📈 Problem Statistics")
+            problem_counts = get_problem_count_by_topic()
+            
+            if problem_counts:
+                fig = create_problem_stats_chart(problem_counts)
+                st.plotly_chart(fig, use_container_width=True)
+        
+        # Related topics
+        if topic in TOPIC_DEPENDENCIES:
+            dependencies = TOPIC_DEPENDENCIES[topic]
+            if dependencies:
+                st.markdown("---")
+                st.subheader("🔗 Related Topics to Study First")
+                st.write("Consider learning these topics before diving deep into the problems:")
+                for dep in dependencies:
+                    if dep in available_topics:
+                        dep_count = len(get_problems_by_topic_and_level(dep, "all"))
+                        st.write(f"• **{dep}** ({dep_count} problems available)")
+                    else:
+                        st.write(f"• **{dep}** (learning path available)")
 
 if __name__ == "__main__":
     main() 
