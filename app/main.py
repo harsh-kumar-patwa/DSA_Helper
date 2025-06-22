@@ -44,6 +44,18 @@ st.set_page_config(
 
 st.markdown("""
 <style>
+    /* --- THEME --- */
+    :root {
+        --bg-color: #1a1a1a;
+        --surface-color: #282828;
+        --border-color: #3d3d3d;
+        --primary-color: #ffa500;
+        --primary-hover-color: #ffc107;
+        --text-color: #eff1f3;
+        --text-secondary-color: #d1d5db;
+        --font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    }
+
     /* --- GENERAL & DEFAULTS --- */
     /* Hide Streamlit's default elements */
     #MainMenu { visibility: hidden; }
@@ -54,8 +66,8 @@ st.markdown("""
 
     /* --- LAYOUT & THEME --- */
     .stApp {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+        background-color: var(--bg-color);
+        font-family: var(--font-family);
     }
 
     /* Main content area fix */
@@ -66,17 +78,18 @@ st.markdown("""
 
     /* Sidebar */
     .css-1d391kg {
-        background: linear-gradient(180deg, #2c3e50 0%, #34495e 100%);
+        background-color: var(--bg-color);
+        border-right: 1px solid var(--border-color);
     }
 
     /* --- TYPOGRAPHY --- */
     /* General text contrast */
     .stMarkdown, .stText, .stWrite, .stSelectbox, .stMultiSelect {
-        color: #ffffff !important;
+        color: var(--text-color) !important;
     }
     
     p {
-        color: #f8f9fa;
+        color: var(--text-secondary-color);
         line-height: 1.6;
     }
 
@@ -84,47 +97,46 @@ st.markdown("""
         font-size: 3.5rem;
         font-weight: 700;
         text-align: center;
-        color: #ffffff;
+        color: var(--text-color);
         margin-bottom: 2rem;
-        text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5), 0 0 20px rgba(255, 255, 255, 0.3);
+        text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.5);
         letter-spacing: -0.02em;
     }
     
     .sub-header {
         font-size: 1.8rem;
         font-weight: 600;
-        color: #ffffff;
+        color: var(--text-color);
+        border-bottom: 2px solid var(--primary-color);
+        padding-bottom: 0.5rem;
         margin-bottom: 1.5rem;
-        text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2);
         letter-spacing: -0.01em;
     }
     
     h1, h2, h3, h4, h5, h6 {
-        color: #ffffff;
+        color: var(--text-color);
         font-weight: 600;
-        text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2);
     }
     
     strong, b {
-        color: #ffffff;
+        color: var(--text-color);
         font-weight: 600;
-        text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2);
     }
 
     a {
-        color: #74b9ff;
+        color: var(--primary-color);
         text-decoration: none;
         font-weight: 500;
     }
     
     a:hover {
-        color: #0984e3;
+        color: var(--primary-hover-color);
         text-decoration: underline;
     }
 
     code {
-        background: rgba(255, 255, 255, 0.1);
-        color: #ffffff;
+        background: rgba(255, 165, 0, 0.15);
+        color: var(--primary-color);
         padding: 0.2rem 0.4rem;
         border-radius: 4px;
         font-family: 'Courier New', monospace;
@@ -132,86 +144,90 @@ st.markdown("""
 
     /* --- CUSTOM BOXES & CARDS --- */
     .info-box, .success-box, .warning-box {
-        color: #ffffff;
+        color: var(--text-color);
         padding: 1.5rem;
         border-radius: 12px;
-        border-left: 5px solid #ffffff;
+        border-left: 5px solid var(--primary-color);
         box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
         margin-bottom: 1rem;
-        backdrop-filter: blur(10px);
+        background-color: var(--surface-color);
     }
-    .info-box { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); }
-    .success-box { background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%); }
-    .warning-box { background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); }
+    .info-box { background-color: var(--surface-color); }
+    .success-box { background-color: var(--surface-color); }
+    .warning-box { background-color: var(--surface-color); }
     
     .info-box h3, .success-box h3, .warning-box h3 {
-        color: #ffffff;
+        color: var(--text-color);
         font-weight: 600;
         margin-bottom: 0.5rem;
-        text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2);
+        text-shadow: none;
     }
     
     .info-box p, .info-box ul, .info-box ol,
     .success-box ul, .success-box ol,
     .warning-box ol {
-        color: #f8f9fa;
+        color: var(--text-secondary-color);
         line-height: 1.6;
         margin-bottom: 0.5rem;
     }
 
     blockquote {
-        background: rgba(255, 255, 255, 0.1);
-        border-left: 4px solid #667eea;
+        background: var(--surface-color);
+        border-left: 4px solid var(--primary-color);
         padding: 1rem;
         border-radius: 8px;
-        color: #f8f9fa;
+        color: var(--text-secondary-color);
     }
 
     /* --- WIDGETS --- */
     .stButton > button {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        color: #ffffff;
+        background: var(--primary-color);
+        color: var(--bg-color);
         border: none;
         border-radius: 8px;
         padding: 0.5rem 1rem;
-        font-weight: 500;
+        font-weight: 600;
         box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
         transition: all 0.3s ease;
     }
     
     .stButton > button:hover {
         transform: translateY(-2px);
-        box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+        box-shadow: 0 6px 20px rgba(255, 165, 0, 0.3);
+        background: var(--primary-hover-color);
     }
 
     .stSelectbox > div > div, .stMultiSelect > div > div {
-        background: rgba(255, 255, 255, 0.1);
+        background: var(--surface-color);
         border-radius: 8px;
-        color: #ffffff;
+        border: 1px solid var(--border-color);
+        color: var(--text-color);
     }
     
-    .stCheckbox > div > div { color: #ffffff; }
+    .stCheckbox > div > div { color: var(--text-color); }
     
     .stProgress > div > div > div {
-        background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+        background: var(--primary-color);
     }
     
     .streamlit-expanderHeader {
-        background: rgba(255, 255, 255, 0.1);
-        color: #ffffff;
+        background: var(--surface-color);
+        color: var(--text-color);
         border-radius: 8px;
         font-weight: 500;
+        border: 1px solid var(--border-color);
     }
 
     .stAlert {
         border-radius: 8px;
-        backdrop-filter: blur(10px);
+        background-color: var(--surface-color);
     }
     
     .js-plotly-plot {
-        background: rgba(255, 255, 255, 0.05);
+        background: var(--surface-color);
         border-radius: 12px;
         padding: 1rem;
+        box-sizing: border-box;
     }
 </style>
 """, unsafe_allow_html=True)
@@ -393,7 +409,7 @@ def show_learning_path():
         learning_path = st.session_state.topic_graph.get_learning_path(target_topic, known_topics)
         
         # Display results
-        col1, col2 = st.columns([2, 1])
+        col1, col2 = st.columns([2, 1], gap="large")
         
         with col1:
             st.subheader("📚 Your Personalized Learning Path")
