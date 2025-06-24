@@ -123,31 +123,48 @@ def create_learning_path_chart(topics: List[str]) -> go.Figure:
     if not topics:
         return None
     
-    # Create data for the chart
-    df = pd.DataFrame({
-        'Topic': topics,
-        'Order': range(1, len(topics) + 1),
-        'Step': [f"Step {i}" for i in range(1, len(topics) + 1)]
-    })
-    
-    fig = px.bar(
-        df,
-        x='Order',
-        y='Topic',
-        orientation='h',
-        title='Learning Path Visualization',
-        labels={'Order': 'Learning Order', 'Topic': 'Topics'},
-        color='Order',
-        color_continuous_scale='viridis'
-    )
-    
-    fig.update_layout(
-        xaxis_title="Learning Order",
-        yaxis_title="Topics",
-        height=400
-    )
-    
-    return fig
+    try:
+        # Create data for the chart
+        df = pd.DataFrame({
+            'Topic': topics,
+            'Order': range(1, len(topics) + 1),
+            'Step': [f"Step {i}" for i in range(1, len(topics) + 1)]
+        })
+        
+        fig = px.bar(
+            df,
+            x='Order',
+            y='Topic',
+            orientation='h',
+            title='Learning Path Visualization',
+            labels={'Order': 'Learning Order', 'Topic': 'Topics'},
+            color='Order',
+            color_continuous_scale='viridis'
+        )
+        
+        # Enhanced layout configuration for better deployment compatibility
+        fig.update_layout(
+            xaxis_title="Learning Order",
+            yaxis_title="Topics",
+            height=max(400, len(topics) * 40),  # Dynamic height based on content
+            margin=dict(l=20, r=20, t=40, b=20),  # Better margins for mobile
+            font=dict(size=12),  # Consistent font size
+            showlegend=False,  # Remove legend to save space
+            paper_bgcolor='rgba(0,0,0,0)',  # Transparent background
+            plot_bgcolor='rgba(0,0,0,0)'   # Transparent plot area
+        )
+        
+        # Make text more readable for deployment
+        fig.update_traces(
+            textposition='auto',
+            textfont=dict(size=10, color='white')
+        )
+        
+        return fig
+        
+    except Exception as e:
+        st.error(f"Chart rendering error: {str(e)}")
+        return None
 
 def create_progress_tracker(topics: List[str], completed_topics: List[str] = None) -> Dict[str, bool]:
     """
@@ -264,26 +281,44 @@ def create_problem_stats_chart(problem_counts: Dict[str, int]) -> go.Figure:
     if not problem_counts:
         return None
     
-    topics = list(problem_counts.keys())
-    counts = list(problem_counts.values())
-    
-    fig = px.bar(
-        x=topics,
-        y=counts,
-        title='Available Problems by Topic',
-        labels={'x': 'Topics', 'y': 'Number of Problems'},
-        color=counts,
-        color_continuous_scale='viridis'
-    )
-    
-    fig.update_layout(
-        xaxis_title="Topics",
-        yaxis_title="Number of Problems",
-        height=400,
-        xaxis_tickangle=-45
-    )
-    
-    return fig
+    try:
+        topics = list(problem_counts.keys())
+        counts = list(problem_counts.values())
+        
+        fig = px.bar(
+            x=topics,
+            y=counts,
+            title='Available Problems by Topic',
+            labels={'x': 'Topics', 'y': 'Number of Problems'},
+            color=counts,
+            color_continuous_scale='viridis'
+        )
+        
+        # Enhanced layout for deployment compatibility
+        fig.update_layout(
+            xaxis_title="Topics",
+            yaxis_title="Number of Problems",
+            height=400,
+            xaxis_tickangle=-45,
+            margin=dict(l=20, r=20, t=40, b=60),  # Extra bottom margin for rotated labels
+            font=dict(size=11),
+            showlegend=False,
+            paper_bgcolor='rgba(0,0,0,0)',
+            plot_bgcolor='rgba(0,0,0,0)'
+        )
+        
+        # Better text handling for long topic names
+        fig.update_xaxes(
+            tickmode='array',
+            tickvals=list(range(len(topics))),
+            ticktext=[topic[:15] + "..." if len(topic) > 15 else topic for topic in topics]
+        )
+        
+        return fig
+        
+    except Exception as e:
+        st.error(f"Stats chart rendering error: {str(e)}")
+        return None
 
 def display_problem_summary(total_problems: int, topic: str, level: str):
     """
