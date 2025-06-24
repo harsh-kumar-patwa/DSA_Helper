@@ -80,11 +80,19 @@ class TopicGraph:
         if known_topics is None:
             known_topics = []
         
-        # Get all prerequisites
+        # Get all prerequisites for the target topic
         all_prerequisites = self.get_prerequisites(target_topic)
         
-        # Filter out already known topics
-        unknown_prerequisites = [topic for topic in all_prerequisites if topic not in known_topics]
+        # Also get all prerequisites for known topics to avoid suggesting them
+        known_prerequisites = set()
+        for known_topic in known_topics:
+            known_prerequisites.update(self.get_prerequisites(known_topic))
+        
+        # Filter out already known topics and their prerequisites
+        unknown_prerequisites = [
+            topic for topic in all_prerequisites 
+            if topic not in known_topics and topic not in known_prerequisites
+        ]
         
         # Add target topic if not known
         if target_topic not in known_topics:

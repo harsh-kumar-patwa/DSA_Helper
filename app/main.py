@@ -38,6 +38,7 @@ from utils.helpers import (
     create_problem_stats_chart,
     display_problem_summary
 )
+from utils.gemini_chat import create_gemini_chat_interface, display_chat_interface
 
 # Page configuration
 st.set_page_config(
@@ -239,6 +240,169 @@ st.markdown("""
         padding: 1rem;
         box-sizing: border-box;
     }
+
+    /* --- CHAT INTERFACE STYLING --- */
+    /* Chat message containers */
+    .stChatMessage {
+        background-color: var(--surface-color) !important;
+        border: 1px solid var(--border-color) !important;
+        border-radius: 12px !important;
+        margin-bottom: 1rem !important;
+        padding: 1rem !important;
+    }
+
+    /* User message styling */
+    .stChatMessage[data-testid="chatMessage"] {
+        background-color: rgba(255, 165, 0, 0.1) !important;
+        border-left: 4px solid var(--primary-color) !important;
+    }
+
+    /* Assistant message styling */
+    .stChatMessage[data-testid="chatMessage"] .stChatMessageContent {
+        color: var(--text-color) !important;
+    }
+
+    /* Chat input area */
+    .stTextArea textarea {
+        background-color: var(--surface-color) !important;
+        color: var(--text-color) !important;
+        border: 1px solid var(--border-color) !important;
+        border-radius: 8px !important;
+    }
+
+    /* Primary chat buttons (Send Question) */
+    .stForm .stButton > button[data-testid="baseButton-primary"] {
+        background: linear-gradient(135deg, var(--primary-color), var(--primary-hover-color)) !important;
+        color: var(--bg-color) !important;
+        border: none !important;
+        border-radius: 8px !important;
+        padding: 0.75rem 1.5rem !important;
+        font-weight: 600 !important;
+        font-size: 1rem !important;
+        box-shadow: 0 4px 15px rgba(255, 165, 0, 0.3) !important;
+        transition: all 0.3s ease !important;
+        text-transform: none !important;
+    }
+
+    .stForm .stButton > button[data-testid="baseButton-primary"]:hover {
+        transform: translateY(-2px) !important;
+        box-shadow: 0 6px 20px rgba(255, 165, 0, 0.4) !important;
+        background: linear-gradient(135deg, var(--primary-hover-color), #ffcc29) !important;
+    }
+
+    /* Secondary chat buttons (Clear, Clear History, etc.) */
+    .stForm .stButton > button[data-testid="baseButton-secondary"],
+    .stButton > button[data-testid="baseButton-secondary"] {
+        background: var(--surface-color) !important;
+        color: var(--text-color) !important;
+        border: 2px solid var(--border-color) !important;
+        border-radius: 8px !important;
+        padding: 0.75rem 1.5rem !important;
+        font-weight: 500 !important;
+        font-size: 1rem !important;
+        transition: all 0.3s ease !important;
+        text-transform: none !important;
+    }
+
+    .stForm .stButton > button[data-testid="baseButton-secondary"]:hover,
+    .stButton > button[data-testid="baseButton-secondary"]:hover {
+        background: rgba(255, 165, 0, 0.1) !important;
+        color: var(--primary-color) !important;
+        border-color: var(--primary-color) !important;
+        transform: translateY(-1px) !important;
+    }
+
+    /* Suggested question buttons */
+    .stButton > button:not([data-testid="baseButton-primary"]):not([data-testid="baseButton-secondary"]) {
+        background: var(--surface-color) !important;
+        color: var(--text-color) !important;
+        border: 1px solid var(--border-color) !important;
+        border-radius: 8px !important;
+        padding: 0.5rem 1rem !important;
+        font-weight: 400 !important;
+        transition: all 0.3s ease !important;
+        text-align: left !important;
+        white-space: normal !important;
+        height: auto !important;
+        min-height: 3rem !important;
+    }
+
+    .stButton > button:not([data-testid="baseButton-primary"]):not([data-testid="baseButton-secondary"]):hover {
+        background: rgba(255, 165, 0, 0.15) !important;
+        color: var(--primary-color) !important;
+        border-color: var(--primary-color) !important;
+        transform: translateY(-1px) !important;
+        box-shadow: 0 2px 10px rgba(255, 165, 0, 0.2) !important;
+    }
+
+    /* Chat message text */
+    .stChatMessage p, .stChatMessage div {
+        color: var(--text-color) !important;
+    }
+
+    /* Chat message code blocks */
+    .stChatMessage pre {
+        background: rgba(255, 165, 0, 0.15) !important;
+        color: var(--primary-color) !important;
+        border: 1px solid var(--border-color) !important;
+        border-radius: 4px !important;
+        padding: 0.5rem !important;
+    }
+
+    /* Chat message lists */
+    .stChatMessage ul, .stChatMessage ol {
+        color: var(--text-secondary-color) !important;
+    }
+
+    /* Chat message links */
+    .stChatMessage a {
+        color: var(--primary-color) !important;
+    }
+
+    .stChatMessage a:hover {
+        color: var(--primary-hover-color) !important;
+    }
+
+    /* --- ANIMATIONS --- */
+    @keyframes pulse {
+        0% {
+            opacity: 1;
+            transform: scale(1);
+        }
+        50% {
+            opacity: 0.7;
+            transform: scale(1.02);
+        }
+        100% {
+            opacity: 1;
+            transform: scale(1);
+        }
+    }
+
+    .pulse {
+        animation: pulse 2s infinite;
+    }
+
+    /* Form styling */
+    .stForm {
+        background: var(--surface-color) !important;
+        border: 1px solid var(--border-color) !important;
+        border-radius: 12px !important;
+        padding: 1rem !important;
+    }
+
+    /* Download button styling */
+    .stDownloadButton > button {
+        background: var(--surface-color) !important;
+        color: var(--text-color) !important;
+        border: 1px solid var(--border-color) !important;
+    }
+
+    .stDownloadButton > button:hover {
+        background: var(--primary-color) !important;
+        color: var(--bg-color) !important;
+        border-color: var(--primary-color) !important;
+    }
 </style>
 """, unsafe_allow_html=True)
 
@@ -246,14 +410,14 @@ def main():
     """Main application function"""
     
     # Header
-    st.markdown('<h1 class="main-header">📚 DSA Topic Recommendation System</h1>', unsafe_allow_html=True)
+    st.markdown('<h1 class="main-header">📚 DSA Learning Assistant</h1>', unsafe_allow_html=True)
     
     # Sidebar
     with st.sidebar:
         st.header("🎯 Navigation")
         page = st.selectbox(
             "Choose a page",
-            ["🏠 Home", "📚 Study Plan", "🧩 Problem Suggestions", "ℹ️ About"]
+            ["🏠 Home", "📚 Study Plan", "🧩 Problem Suggestions", "💬 Chat", "ℹ️ About"]
         )
         
         st.markdown("---")
@@ -275,10 +439,12 @@ def main():
         show_home_page()
     elif page == "📚 Study Plan":
         show_study_plan()
-    elif page == "ℹ️ About":
-        show_about_page()
+    elif page == "💬 Chat":
+        show_chat_interface()
     elif page == "🧩 Problem Suggestions":
         show_problem_suggestions()
+    elif page == "ℹ️ About":
+        show_about_page()
 
 def show_home_page():
     """Display the home page"""
@@ -304,6 +470,7 @@ def show_home_page():
         <li><strong>Personalized Learning Paths:</strong> Get customized study recommendations</li>
         <li><strong>Smart Topic Selection:</strong> Choose your target and known topics</li>
         <li><strong>Problem Suggestions:</strong> Practice with curated problems by difficulty</li>
+        <li><strong>AI Chat Assistant:</strong> Ask questions and get instant help with DSA concepts</li>
         <li><strong>Graph Visualization:</strong> See topic relationships visually</li>
         <li><strong>Progress Tracking:</strong> Track your learning progress</li>
         </ul>
@@ -320,6 +487,7 @@ def show_home_page():
         <li>Mark topics you already know</li>
         <li>Get your personalized study path!</li>
         <li>Practice with <strong>Problem Suggestions</strong></li>
+        <li>Ask questions in the <strong>AI Chat</strong> section</li>
         </ol>
         </div>
         """, unsafe_allow_html=True)
@@ -616,6 +784,19 @@ def show_problem_suggestions():
                         st.write(f"• **{dep}** ({dep_count} problems available)")
                     else:
                         st.write(f"• **{dep}** (learning path available)")
+
+def show_chat_interface():
+    """Display the chat interface"""
+    
+    st.markdown('<h2 class="sub-header">💬 AI Chat Assistant</h2>', unsafe_allow_html=True)
+    
+    # Create chat interface
+    chat = create_gemini_chat_interface()
+    
+    if chat:
+        display_chat_interface(chat)
+    else:
+        st.info("Please add your Gemini API key to use the chat feature.")
 
 if __name__ == "__main__":
     main() 
