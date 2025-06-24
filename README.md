@@ -2,6 +2,10 @@
 
 A comprehensive web application that helps users identify the optimal learning path for DSA topics using graph algorithms and provides AI-powered chat assistance for DSA questions.
 
+## Deployed Link : https://harshkumarpatwa-dsa.streamlit.app/
+
+## Demo Video : https://www.loom.com/share/482c038bd14a4d81a9c5663cb6aa4380?sid=f301e52f-0405-4921-8047-7f60e77f4812
+
 ## Features
 
 - **Topic Dependency Analysis**: Uses topological sorting to determine prerequisite topics
